@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real-Time monitoring</title>
+  </head>
+  <body>
+    <div class="real-time-monitoring">
+      <h2>Real-Time Monitoring</h2>
+      <canvas id="realTimeChart"></canvas>
+    </div>
+  </body>
+  <script>
+    const ctx = document.getElementById("realTimeChart").getContext("2d");
+    const realTimeChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [], // Timestamps
+        datasets: [
+          {
+            label: "Power Output (kW)",
+            data: [],
+            borderColor: "green",
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {display: true, title: {display: true, text: "Time"}},
+          y: {display: true, title: {display: true, text: "kW"}},
+        },
+      },
+    });
+
+    // Function to update chart with new data
+    function updateRealTimeChart(newData) {
+      realTimeChart.data.labels.push(newData.timestamp);
+      realTimeChart.data.datasets[0].data.push(newData.power);
+      realTimeChart.update();
+    }
+
+    // Simulate real-time data fetching
+    setInterval(() => {
+      fetch("/api/real-time")
+        .then((response) => response.json())
+        .then((data) => {
+          updateRealTimeChart(data);
+        });
+    }, 5000); // Update every 5 seconds
+  </script>
+</html>

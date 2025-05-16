@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Component-Level Monitoring</title>
+  </head>
+  <body>
+    <div class="component-monitoring">
+      <h2>Component Monitoring</h2>
+      <table id="componentTable">
+        <thead>
+          <tr>
+            <th>Component ID</th>
+            <th>Status</th>
+            <th>Output (kW)</th>
+            <th>Temperature (°C)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be populated here -->
+        </tbody>
+      </table>
+    </div>
+  </body>
+  <script>
+    fetch("/api/components")
+      .then((response) => response.json())
+      .then((components) => {
+        const tbody = document
+          .getElementById("componentTable")
+          .querySelector("tbody");
+        components.forEach((component) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+        <td>${component.id}</td>
+        <td>${component.status}</td>
+        <td>${component.output}</td>
+        <td>${component.temperature}</td>
+      `;
+          tbody.appendChild(row);
+        });
+      });
+  </script>
+</html>

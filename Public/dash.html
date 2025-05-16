@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard page</title>
+    <style>
+      .dashboard-overview {
+        padding: 20px;
+      }
+      .metrics {
+        display: flex;
+        justify-content: space-around;
+      }
+      .metric {
+        background-color: #f0f0f0;
+        padding: 10px;
+        border-radius: 5px;
+        width: 30%;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>System Overview</h2>
+    <div class="metrics">
+      <div class="metric">
+        <h3>Current Production</h3>
+        <p id="current-production">-- kW</p>
+      </div>
+      <div class="metric">
+        <h3>Current Consumption</h3>
+        <p id="current-consumption">-- kW</p>
+      </div>
+      <div class="metric">
+        <h3>System Health</h3>
+        <p id="system-health">--</p>
+      </div>
+    </div>
+  </body>
+  <script>
+    // Sample data fetching and DOM update
+    fetch("/api/overview")
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById(
+          "current-production"
+        ).textContent = `${data.production} kW`;
+        document.getElementById(
+          "current-consumption"
+        ).textContent = `${data.consumption} kW`;
+        document.getElementById("system-health").textContent = data.health;
+      });
+  </script>
+</html>

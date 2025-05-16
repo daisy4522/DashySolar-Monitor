@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Historical Data Analysis</title>
+  </head>
+  <body>
+    <div class="historical-analysis">
+      <h2>Historical Data</h2>
+      <select id="timeframe">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+      <canvas id="historicalChart"></canvas>
+    </div>
+  </body>
+  <script>
+    const historicalCtx = document
+      .getElementById("historicalChart")
+      .getContext("2d");
+    const historicalChart = new Chart(historicalCtx, {
+      type: "bar",
+      data: {
+        labels: [], // Dates
+        datasets: [
+          {
+            label: "Energy Generated (kWh)",
+            data: [],
+            backgroundColor: "blue",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {display: true, title: {display: true, text: "Date"}},
+          y: {display: true, title: {display: true, text: "kWh"}},
+        },
+      },
+    });
+
+    document.getElementById("timeframe").addEventListener("change", (event) => {
+      const timeframe = event.target.value;
+      fetch(`/api/historical?timeframe=${timeframe}`)
+        .then((response) => response.json())
+        .then((data) => {
+          historicalChart.data.labels = data.labels;
+          historicalChart.data.datasets[0].data = data.values;
+          historicalChart.update();
+        });
+    });
+  </script>
+</html>

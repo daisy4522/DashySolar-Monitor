@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management</title>
+  </head>
+  <body>
+    <div class="user-management">
+      <h2>User Management</h2>
+      <form id="addUserForm">
+        <input type="text" id="username" placeholder="Username" required />
+        <select id="role">
+          <option value="admin">Admin</option>
+          <option value="viewer">Viewer</option>
+        </select>
+        <button type="submit">Add User</button>
+      </form>
+      <ul id="userList">
+        <!-- User list will be populated here -->
+      </ul>
+    </div>
+  </body>
+  <script>
+    document
+      .getElementById("addUserForm")
+      .addEventListener("submit", (event) => {
+        event.preventDefault();
+        const username = document.getElementById("username").value;
+        const role = document.getElementById("role").value;
+        fetch("/api/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({username, role}),
+        })
+          .then((response) => response.json())
+          .then((user) => {
+            const userList = document.getElementById("userList");
+            const listItem = document.createElement("li");
+            listItem.textContent = `${user.username} - ${user.role}`;
+            userList.appendChild(listItem);
+          });
+      });
+  </script>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solar Monitor Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      header {
+        background-color: #2c3e50;
+        color: #ecf0f1;
+        padding: 1rem;
+        text-align: center;
+      }
+
+      .metrics {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 1rem;
+      }
+
+      .card {
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin: 1rem;
+        padding: 1rem;
+        text-align: center;
+        width: 200px;
+      }
+
+      .chart-container {
+        margin: 2rem;
+      }
+
+      footer {
+        background-color: #ecf0f1;
+        padding: 1rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Solar Monitor Dashboard</h1>
+    </header>
+    <main>
+      <section class="metrics">
+        <div class="card">
+          <h2>Voltage</h2>
+          <p id="voltage">-- V</p>
+        </div>
+        <div class="card">
+          <h2>Current</h2>
+          <p id="current">-- A</p>
+        </div>
+        <div class="card">
+          <h2>Power</h2>
+          <p id="power">-- W</p>
+        </div>
+        <div class="card">
+          <h2>Battery</h2>
+          <p id="battery">-- %</p>
+        </div>
+      </section>
+
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="dataFile" />
+        <button type="submit">Upload</button>
+      </form>
+
+      <script>
+        /* document
+          .getElementById("uploadForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("/upload", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                // Handle success
+              })
+              .catch((error) => {
+                // Handle error
+              });
+          });*/
+        const voltageEl = document.getElementById("voltage");
+        const currentEl = document.getElementById("current");
+        const powerEl = document.getElementById("power");
+        const batteryEl = document.getElementById("battery");
+        const timestampEl = document.getElementById("timestamp");
+
+        const ctx = document.getElementById("powerChart").getContext("2d");
+        const powerChart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: "Power (W)",
+                data: [],
+                borderColor: "rgba(46, 204, 113, 1)",
+                backgroundColor: "rgba(46, 204, 113, 0.2)",
+                fill: true,
+                tension: 0.1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Time",
+                },
+              },
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "Power (W)",
+                },
+              },
+            },
+          },
+        });
+
+        function updateMetrics() {
+          // Simulate data
+          const voltage = (Math.random() * 20 + 20).toFixed(2); // 20-40V
+          const current = (Math.random() * 5 + 5).toFixed(2); // 5-10A
+          const power = (voltage * current).toFixed(2);
+          const battery = (Math.random() * 100).toFixed(0);
+          const timestamp = new Date().toLocaleTimeString();
+
+          // Update DOM
+          voltageEl.textContent = `${voltage} V`;
+          currentEl.textContent = `${current} A`;
+          powerEl.textContent = `${power} W`;
+          batteryEl.textContent = `${battery} %`;
+          timestampEl.textContent = timestamp;
+
+          // Update chart
+          if (powerChart.data.labels.length >= 20) {
+            powerChart.data.labels.shift();
+            powerChart.data.datasets[0].data.shift();
+          }
+          powerChart.data.labels.push(timestamp);
+          powerChart.data.datasets[0].data.push(power);
+          powerChart.update();
+        }
+        document
+          .getElementById("contact-form")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            // Implement form submission logic here
+            alert(
+              "Thank you for contacting  us!.Daisy will get back to you soon"
+            );
+          });
+
+        document
+          .getElementById("uploadForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("/upload", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                // Handle success
+              })
+              .catch((error) => {
+                // Handle error
+              });
+          });
+        // Initial update
+        updateMetrics();
+        // Update every 5 seconds
+        setInterval(updateMetrics, 5000);
+      </script>
+
+      <section class="chart-container">
+        <canvas id="powerChart"></canvas>
+      </section>
+    </main>
+    <footer>
+      <p>Last updated: <span id="timestamp">--</span></p>
+    </footer>
+    <script src="main.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Solar Monitor Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        text-align: center;
+        padding: 50px;
+      }
+
+      .sensor-data {
+        margin: 20px 0;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Solar Monitoring System</h1>
+      <div class="sensor-data">
+        <p>Dust Level: <span id="dust">Loading...</span></p>
+        <p>Light Level: <span id="light">Loading...</span></p>
+      </div>
+      <button id="refresh">Refresh Data</button>
+    </div>
+    <script>
+      document.getElementById("refresh").addEventListener("click", () => {
+        fetch("/sensor-data")
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("dust").textContent = data.dust;
+            document.getElementById("light").textContent = data.light;
+          })
+          .catch((error) =>
+            console.error("Error fetching sensor data:", error)
+          );
+      });
+      fetch("/api/user-data")
+        .then((response) => response.json())
+        .then((data) => {
+          // Use Chart.js to visualize data
+        });
+    </script>
+  </body>
+</html>
